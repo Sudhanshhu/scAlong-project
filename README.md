@@ -67,12 +67,37 @@ lib/
 │   │   ├── widgets/               # KText, KDropdown, KTextField, KButton
 │   │   └── constants/             # AppColors, Sizes, Assets
 │   └── features/                  # Distinct modular feature layers
-│       ├── auth/                  # Session Init, Captcha validation, 2FA & OTP
-│       ├── dashboard/             # Balance overview & sparklines
-│       ├── account/               # KYC, Bank, and Personal Info
-│       ├── settings/              # Profiles editing, passwords & logout
-│       └── notifications/         # Alerts logs & Read/Unread actions
+│       ├── auth/                  # Authentication module (Session, Captcha, OTP)
+│       │   ├── data/              # Models & Repository implementations
+│       │   ├── domain/            # Repository interfaces/contracts
+│       │   └── presentation/      # BLoCs/Cubits, Screens & Subwidgets
+│       ├── dashboard/             # Portfolio overview, holdings & sparklines (data/domain/presentation)
+│       ├── account/               # KYC status, banking & profile information (data/domain/presentation)
+│       ├── settings/              # Custom Material 3 theme & security controls (data/domain/presentation)
+│       └── notifications/         # Activity logs & unread trackers (data/domain/presentation)
 ```
+
+### Clean Architecture Layers
+
+Each feature folder is strictly structured into three layers to isolate dependencies and enforce clean code boundaries:
+
+1. **Presentation Layer (`presentation/`)**:
+   - **Responsibility**: Rendering user interfaces and executing user interaction flows.
+   - **Components**:
+     - **UI Screens & Views**: Reusable layouts built with Material 3 styling.
+     - **BLoCs / Cubits**: Emits distinct states (e.g. `Loading`, `Loaded`, `Error`) in response to actions and fetches data from repositories.
+     - **Custom Widgets**: Domain-specific UI subcomponents (like sliders or PIN inputs).
+
+2. **Domain Layer (`domain/`)**:
+   - **Responsibility**: Encapsulating the core business rules and defining data boundaries. This layer is fully pure and free of external framework dependencies (like Dio or Flutter).
+   - **Components**:
+     - **Repository Interfaces**: Abstract classes defining the data-fetching contracts (e.g. `AuthRepository`, `AccountRepository`).
+
+3. **Data Layer (`data/`)**:
+   - **Responsibility**: Implementing repository contracts and handling networking and serialization.
+   - **Components**:
+     - **Repository Implementations**: Implements the abstract contracts defined in the domain layer. Handles Dio network calls, local file system reads/writes, secure token storage, and recovery logic.
+     - **Data Models**: JSON-serializable DTOs (Data Transfer Objects) derived from raw payloads using automated code generators (`json_serializable`).
 
 ### Key Framework & Technology Choices
 1. **State Management**: **BLoC / Cubit** (`flutter_bloc`). Used to drive reactive states per screen (e.g., `AuthCubit` driving login checkpoints, `ThemeCubit` driving dark mode toggles).
