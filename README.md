@@ -110,8 +110,8 @@ Each feature folder is strictly structured into three layers to isolate dependen
 
 ## ⚠️ Known Limitations & API Fallbacks
 
-1. **Database Uninitialized Fallbacks**:
+1. **Database Uninitialized Errors**:
    - Several personal info endpoints under `/api/client/client-profiles/` return a `500 Unexpected Error` on the DEV environment due to database initialization constraints with the test account.
-   - **Solution**: A robust repository fallback structure is implemented in [AccountRepositoryImpl](file:///Users/sudhanshu/Desktop/CBO_SFA/scAlong%20project/lib/src/features/account/data/repositories/account_repository_impl.dart). If the server returns a 500 error, it returns mock data formatted to match the production API documentation, keeping the app crash-free and showing realistic KYC status information.
+   - **Solution**: Any network errors are directly propagated up through [AccountRepositoryImpl](file:///Users/sudhanshu/Desktop/CBO_SFA/scAlong%20project/lib/src/features/account/data/repositories/account_repository_impl.dart) to the `AccountCubit`. The UI handles these states by showing a Material 3 error widget featuring the error details and a **Retry** button so users can re-trigger data loading once the server database records are configured.
 2. **CAPTCHA Input Validation**:
    - The validation uses slide completion detection (`slider-verified` input) which completes successfully.
