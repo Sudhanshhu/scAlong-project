@@ -1,6 +1,6 @@
 # Midchains Customer Portal - Flutter App
 
-A modern, high-fidelity Flutter mobile application that integrates with the Midchains Customer Portal (`https://cp-dev.midchains.com`). This project features a complete secure login flow, dynamic data-rich portfolio dashboard, tabbed account profile info with KYC status tracking, notifications view, settings pane, and dual dark/light Material 3 theming.
+A modern, high-fidelity Flutter mobile application that integrates with the Midchains Customer Portal (`https://cp-dev.midchains.com`). This project features a complete secure login flow (session → CAPTCHA → OTP → Argon2 login), a dashboard that greets the authenticated user and lists linked wallets, a tabbed account/profile section with KYC status, a notifications view, a settings pane (real 2FA status + backend-synced theme), and dual dark/light Material 3 theming. All screens are bound to live REST endpoints; where the backend has no data (no wallet/bank/notifications on the test account), the UI shows proper empty states rather than mock data.
 
 ---
 
@@ -71,10 +71,10 @@ lib/
 │       │   ├── data/              # Models & Repository implementations
 │       │   ├── domain/            # Repository interfaces/contracts
 │       │   └── presentation/      # BLoCs/Cubits, Screens & Subwidgets
-│       ├── dashboard/             # Portfolio overview, holdings & sparklines (data/domain/presentation)
+│       ├── dashboard/             # User greeting + linked-wallet overview (data/domain/presentation)
 │       ├── account/               # KYC status, banking & profile information (data/domain/presentation)
-│       ├── settings/              # Custom Material 3 theme & security controls (data/domain/presentation)
-│       └── notifications/         # Activity logs & unread trackers (data/domain/presentation)
+│       ├── settings/              # Real 2FA status, backend-synced theme & security controls (data/domain/presentation)
+│       └── notifications/         # Notifications list with empty state (data/domain/presentation)
 ```
 
 ### Clean Architecture Layers
@@ -104,14 +104,21 @@ Each feature folder is strictly structured into three layers to isolate dependen
 2. **Networking**: **Dio** (`dio`). Integrated with global interceptors that automatically inject `sessionId`, `x-user-name`, and `Authorization: Bearer <token>` headers as required by the Midchains gateway.
 3. **Password Hashing**: **Argon2i** (`argon2`). Implemented purely in Dart to hash passwords on-device using the `security` UUID salt returned during session init before sending payloads to `/login/v2`.
 4. **Token Persistence**: **Flutter Secure Storage** (`flutter_secure_storage`). Encrypts and persists tokens in Keychain (iOS) and KeyStore (Android) securely.
-5. **Design System**: **Material 3**. Styled using Outfit fonts, custom Card shapes, dynamic theme switching, and sparkline visualization graphics via `fl_chart`.
+5. **Design System**: **Material 3**. Styled using Outfit fonts, custom Card shapes, and dynamic light/dark theme switching synced to the backend theme preference.
 
 ---
 
 ## ⚠️ Known Limitations & API Fallbacks
 
-1. **Database Uninitialized Errors**:
-   - Several personal info endpoints under `/api/client/client-profiles/` return a `500 Unexpected Error` on the DEV environment due to database initialization constraints with the test account.
-   - **Solution**: Any network errors are directly propagated up through [AccountRepositoryImpl](file:///Users/sudhanshu/Desktop/CBO_SFA/scAlong%20project/lib/src/features/account/data/repositories/account_repository_impl.dart) to the `AccountCubit`. The UI handles these states by showing a Material 3 error widget featuring the error details and a **Retry** button so users can re-trigger data loading once the server database records are configured.
-2. **CAPTCHA Input Validation**:
-   - The validation uses slide completion detection (`slider-verified` input) which completes successfully.
+1. **Documented endpoint paths differ from the live gateway**:
+   - The endpoint spec documents paths like `/api/client-profiles/personal-info` and `/api/dropdowns/countries`, but the live gateway serves them under an `/api/kyc/...` prefix (e.g. `/api/kyc/client-profiles/all`, `/api/kyc/dropdowns/countries`). Calling the documented paths returns a wrapped `500` ("No static resource ..."). The app uses the real working paths; profile/occupation/FATCA/documents are read in one call via `/api/kyc/client-profiles/all`.
+   - Any genuine network error is propagated through the repositories to the cubit, and the UI shows a Material 3 error widget with the error detail and a **Retry** button.
+
+2. **Endpoints with no data on the test account → empty states (no mock data)**:
+   - `GET /api/clientBasicinfo/client/details` returns **404** when no bank is linked (documented behaviour) → "No Bank Linked" empty state.
+   - `GET /api/kyc/client-profiles/wallet` returns an empty list → "No Wallet" empty state on the Dashboard and Account tabs.
+   - There is **no portfolio/balance endpoint** and **no notifications-list endpoint** on the gateway, so the Dashboard wallet area and Notifications list render empty-state illustrations instead of fabricated values.
+   - `GET /api/2fa/status` and `GET/POST /api/kyc/theme` are wired in Settings (real 2FA status display + backend-synced theme). `GET /api/client-profiles/image` and `GET /api/notifications/preferences` have no working gateway path and are not used.
+
+3. **CAPTCHA Input Validation**:
+   - The slider is a human-presence gesture; on completion the app sends the backend's expected `captchaInput: "slider-verified"` to `/captcha/validate/v2`. The dev gateway accepts this fixed token (it does not perform positional puzzle matching).

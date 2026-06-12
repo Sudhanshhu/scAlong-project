@@ -38,6 +38,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
     final storage = context.read<SecureStorageService>();
     final hasSession = await storage.hasValidSession();
+    if (!mounted) return;
 
     if (hasSession) {
       context.go('/dashboard');
@@ -61,7 +62,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
         decoration: BoxDecoration(
           gradient: RadialGradient(
             colors: [
-              theme.colorScheme.primary.withOpacity(0.15),
+              theme.colorScheme.primary.withValues(alpha: 0.15),
               theme.scaffoldBackgroundColor,
             ],
             radius: 1.2,
@@ -81,7 +82,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: theme.colorScheme.primary.withOpacity(0.3),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.3),
                         blurRadius: 20,
                         spreadRadius: 2,
                       ),
@@ -106,7 +107,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
               KText(
                 'Customer Portal',
                 style: KTextStyle.bodyMedium,
-                color: theme.colorScheme.onBackground.withOpacity(0.5),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
               const SizedBox(height: 48),
               SizedBox(
@@ -123,8 +124,4 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
       ),
     );
   }
-}
-extension on KText {
-  // Utility support helper for letter spacing in code template
-  Widget get spacing => this;
 }

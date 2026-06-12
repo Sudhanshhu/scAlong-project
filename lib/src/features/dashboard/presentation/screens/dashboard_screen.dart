@@ -9,6 +9,8 @@ import '../../../account/presentation/screens/account_details_view.dart';
 import '../../../notifications/domain/repositories/notifications_repository.dart';
 import '../../../notifications/presentation/bloc/notifications_cubit.dart';
 import '../../../notifications/presentation/screens/notifications_view.dart';
+import '../../../settings/domain/repositories/settings_repository.dart';
+import '../../../settings/presentation/bloc/settings_cubit.dart';
 import '../../../settings/presentation/screens/settings_view.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -26,6 +28,9 @@ class DashboardScreen extends StatelessWidget {
         ),
         BlocProvider<NotificationsCubit>(
           create: (context) => NotificationsCubit(context.read<NotificationsRepository>()),
+        ),
+        BlocProvider<SettingsCubit>(
+          create: (context) => SettingsCubit(context.read<SettingsRepository>())..load(),
         ),
       ],
       child: const DashboardScreenContent(),

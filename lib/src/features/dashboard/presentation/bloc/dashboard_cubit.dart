@@ -10,19 +10,19 @@ class DashboardCubit extends Cubit<DashboardState> {
   Future<void> loadDashboard() async {
     emit(DashboardLoading());
     try {
-      final portfolio = await _repository.getPortfolio();
-      emit(DashboardLoaded(portfolio));
+      final data = await _repository.getDashboard();
+      emit(DashboardLoaded(data));
     } catch (e) {
-      emit(DashboardError(e.toString()));
+      emit(DashboardError(e.toString().replaceAll('Exception:', '').trim()));
     }
   }
 
   Future<void> refreshDashboard() async {
     try {
-      final portfolio = await _repository.getPortfolio();
-      emit(DashboardLoaded(portfolio));
+      final data = await _repository.getDashboard();
+      emit(DashboardLoaded(data));
     } catch (e) {
-      emit(DashboardError(e.toString()));
+      emit(DashboardError(e.toString().replaceAll('Exception:', '').trim()));
     }
   }
 }

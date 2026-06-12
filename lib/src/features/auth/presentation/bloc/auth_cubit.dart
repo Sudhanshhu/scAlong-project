@@ -1,9 +1,23 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/repositories/auth_repository.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository _repository;
+
+  /// Extracts the backend's human-readable message (e.g. "User not found")
+  /// from a failed request instead of surfacing the raw DioException dump.
+  String _friendlyError(Object e) {
+    if (e is DioException) {
+      final data = e.response?.data;
+      if (data is Map) {
+        final msg = data['error'] ?? data['message'];
+        if (msg is String && msg.trim().isNotEmpty) return msg.trim();
+      }
+    }
+    return 'Something went wrong. Please try again.';
+  }
 
   // Local variables to preserve state across actions
   String? _sessionId;
@@ -25,7 +39,16 @@ class AuthCubit extends Cubit<AuthState> {
       _sessionId = sessionRes.sessionId;
       _securityToken = sessionRes.security;
 
-      // 2. Request Captcha
+      // 2. Verify the account exists BEFORE showing the captcha slider.
+      // The backend answers 2fa/check with 404 "User not found" for unknown
+      // accounts, so we surface that on the login screen and never advance to
+      // the Security Check page for an unauthenticated user.
+      await _repository.check2Fa(
+        sessionId: _sessionId!,
+        email: email,
+      );
+
+      // 3. Account is valid → request the captcha challenge.
       final captchaRes = await _repository.requestCaptcha(
         sessionId: _sessionId!,
         email: email,
@@ -35,11 +58,11 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthCaptchaRequired(
         sessionId: _sessionId!,
         securityToken: _securityToken!,
-        captchaId: captchaRes.captchaId,
-        captchaImage: captchaRes.captchaImage,
+        captchaId: captchaRes.data.captchaId,
+        captchaImage: captchaRes.data.imageUrl,
       ));
     } catch (e) {
-      emit(AuthFailure(e.toString()));
+      emit(AuthFailure(_friendlyError(e)));
     }
   }
 
@@ -73,13 +96,14 @@ class AuthCubit extends Cubit<AuthState> {
           sessionId: _sessionId!,
           securityToken: _securityToken!,
         ));
-        // Proceed to 2FA Check automatically
-        await _check2Fa();
+        // The account was already verified before the captcha, so go straight
+        // to fetching the OTP delivery options.
+        await _requestOtpOptions();
       } else {
         emit(AuthFailure("Captcha validation failed", previousState: state));
       }
     } catch (e) {
-      emit(AuthFailure(e.toString(), previousState: state));
+      emit(AuthFailure(_friendlyError(e), previousState: state));
     }
   }
 
@@ -89,7 +113,7 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
 
     try {
-      final twoFaRes = await _repository.check2Fa(
+      await _repository.check2Fa(
         sessionId: _sessionId!,
         email: _email!,
       );
@@ -97,7 +121,7 @@ class AuthCubit extends Cubit<AuthState> {
       // We proceed to request OTP options
       await _requestOtpOptions();
     } catch (e) {
-      emit(AuthFailure(e.toString()));
+      emit(AuthFailure(_friendlyError(e)));
     }
   }
 
@@ -118,7 +142,7 @@ class AuthCubit extends Cubit<AuthState> {
         otpOptions: Map<String, String>.from(otpOptionsRes.otpOptions),
       ));
     } catch (e) {
-      emit(AuthFailure(e.toString()));
+      emit(AuthFailure(_friendlyError(e)));
     }
   }
 
@@ -140,7 +164,7 @@ class AuthCubit extends Cubit<AuthState> {
         maskedDestination: sendRes.maskedAddress,
       ));
     } catch (e) {
-      emit(AuthFailure(e.toString()));
+      emit(AuthFailure(_friendlyError(e)));
     }
   }
 
@@ -167,7 +191,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthFailure("Invalid OTP code", previousState: state));
       }
     } catch (e) {
-      emit(AuthFailure(e.toString(), previousState: state));
+      emit(AuthFailure(_friendlyError(e), previousState: state));
     }
   }
 
@@ -186,7 +210,7 @@ class AuthCubit extends Cubit<AuthState> {
 
       emit(AuthSuccess(loginRes));
     } catch (e) {
-      emit(AuthFailure(e.toString()));
+      emit(AuthFailure(_friendlyError(e)));
     }
   }
 

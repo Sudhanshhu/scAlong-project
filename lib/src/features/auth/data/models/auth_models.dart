@@ -20,22 +20,47 @@ class SessionResponse {
   Map<String, dynamic> toJson() => _$SessionResponseToJson(this);
 }
 
-@JsonSerializable()
-class CaptchaRequestResponse {
-  final String captchaImage;
-  final String message;
+class CaptchaData {
   final String captchaId;
+  final String imageUrl;
+  final String type;
 
-  CaptchaRequestResponse({
-    required this.captchaImage,
-    required this.message,
+  CaptchaData({
     required this.captchaId,
+    required this.imageUrl,
+    required this.type,
   });
 
-  factory CaptchaRequestResponse.fromJson(Map<String, dynamic> json) =>
-      _$CaptchaRequestResponseFromJson(json);
+  /// The live API returns a flat captcha object:
+  ///   { "captchaImage": "data:image/png;base64,...",
+  ///     "captchaId": "...", "message": "..." }
+  /// (Older docs described a nested { success, data:{...} } shape.)
+  factory CaptchaData.fromJson(Map<String, dynamic> json) => CaptchaData(
+        captchaId: (json['captchaId'] ?? '') as String,
+        imageUrl: (json['captchaImage'] ?? json['imageUrl'] ?? '') as String,
+        type: (json['type'] ?? 'SLIDER') as String,
+      );
+}
 
-  Map<String, dynamic> toJson() => _$CaptchaRequestResponseToJson(this);
+class CaptchaRequestResponse {
+  final bool success;
+  final CaptchaData data;
+
+  CaptchaRequestResponse({
+    required this.success,
+    required this.data,
+  });
+
+  factory CaptchaRequestResponse.fromJson(Map<String, dynamic> json) {
+    // Tolerate both the flat live response and a wrapped { data: {...} } shape.
+    final inner = json['data'] is Map
+        ? (json['data'] as Map).cast<String, dynamic>()
+        : json;
+    return CaptchaRequestResponse(
+      success: json['success'] == true || inner['captchaId'] != null,
+      data: CaptchaData.fromJson(inner),
+    );
+  }
 }
 
 @JsonSerializable()

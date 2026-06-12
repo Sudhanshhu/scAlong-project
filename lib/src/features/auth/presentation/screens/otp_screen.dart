@@ -120,40 +120,38 @@ class _OtpScreenState extends State<OtpScreen> {
                   KText(
                     'Choose where you would like to receive your 6-digit verification code.',
                     style: KTextStyle.bodyMedium,
-                    color: theme.colorScheme.onBackground.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                   const SizedBox(height: 40),
                   
-                  // Radio Option PHONE
-                  Card(
-                    child: RadioListTile<String>(
-                      value: 'PHONE',
-                      groupValue: _selectedMethod,
-                      activeColor: theme.colorScheme.primary,
-                      title: const KText('SMS / Mobile Phone', style: KTextStyle.titleMedium, fontWeight: FontWeight.bold),
-                      subtitle: KText(mobileNum, style: KTextStyle.bodyMedium, color: theme.colorScheme.onBackground.withOpacity(0.5)),
-                      onChanged: (val) {
-                        setState(() {
-                          _selectedMethod = val!;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // Radio Option EMAIL
-                  Card(
-                    child: RadioListTile<String>(
-                      value: 'EMAIL',
-                      groupValue: _selectedMethod,
-                      activeColor: theme.colorScheme.primary,
-                      title: const KText('Email Address', style: KTextStyle.titleMedium, fontWeight: FontWeight.bold),
-                      subtitle: KText(emailAddr, style: KTextStyle.bodyMedium, color: theme.colorScheme.onBackground.withOpacity(0.5)),
-                      onChanged: (val) {
-                        setState(() {
-                          _selectedMethod = val!;
-                        });
-                      },
+                  // OTP delivery method selection
+                  RadioGroup<String>(
+                    groupValue: _selectedMethod,
+                    onChanged: (val) {
+                      setState(() {
+                        _selectedMethod = val!;
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        Card(
+                          child: RadioListTile<String>(
+                            value: 'PHONE',
+                            activeColor: theme.colorScheme.primary,
+                            title: const KText('SMS / Mobile Phone', style: KTextStyle.titleMedium, fontWeight: FontWeight.bold),
+                            subtitle: KText(mobileNum, style: KTextStyle.bodyMedium, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Card(
+                          child: RadioListTile<String>(
+                            value: 'EMAIL',
+                            activeColor: theme.colorScheme.primary,
+                            title: const KText('Email Address', style: KTextStyle.titleMedium, fontWeight: FontWeight.bold),
+                            subtitle: KText(emailAddr, style: KTextStyle.bodyMedium, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const Spacer(),
@@ -189,7 +187,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   KText(
                     'We sent a 6-digit verification code to $dest. Enter it below to authorize this session.',
                     style: KTextStyle.bodyMedium,
-                    color: theme.colorScheme.onBackground.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                   const SizedBox(height: 48),
 
@@ -217,7 +215,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                color: theme.colorScheme.outline.withOpacity(0.5),
+                                color: theme.colorScheme.outline.withValues(alpha: 0.5),
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
@@ -266,7 +264,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           KText(
                             'Resend code in ${_secondsRemaining}s',
                             style: KTextStyle.bodyMedium,
-                            color: theme.colorScheme.onBackground.withOpacity(0.5),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                           )
                         else
                           KButton(

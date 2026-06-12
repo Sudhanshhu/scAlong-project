@@ -5,6 +5,9 @@ import 'package:midchains_customer_portal/src/core/theme/theme_cubit.dart';
 import 'package:midchains_customer_portal/src/features/auth/domain/repositories/auth_repository.dart';
 import 'package:midchains_customer_portal/src/features/account/presentation/bloc/account_cubit.dart';
 import 'package:midchains_customer_portal/src/features/account/presentation/bloc/account_state.dart';
+import 'package:midchains_customer_portal/src/features/settings/data/models/settings_models.dart';
+import 'package:midchains_customer_portal/src/features/settings/presentation/bloc/settings_cubit.dart';
+import 'package:midchains_customer_portal/src/features/settings/presentation/bloc/settings_state.dart';
 import 'package:midchains_customer_portal/src/common/widgets/k_text.dart';
 import 'package:midchains_customer_portal/src/common/widgets/k_text_field.dart';
 import 'package:midchains_customer_portal/src/common/widgets/k_button.dart';
@@ -141,12 +144,14 @@ class _SettingsViewState extends State<SettingsView> {
               ),
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
+                  final messenger = ScaffoldMessenger.of(context);
                   final success = await context.read<AccountCubit>().changePassword(
                         currentPassword: currentPasswordController.text,
                         newPassword: newPasswordController.text,
                       );
+                  if (!dialogContext.mounted) return;
                   Navigator.pop(dialogContext);
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text(
                         success ? 'Password updated successfully' : 'Failed to update password',
@@ -167,8 +172,24 @@ class _SettingsViewState extends State<SettingsView> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = BlocProvider.of<ThemeCubit>(context).state == ThemeMode.dark;
+    final settingsState = context.watch<SettingsCubit>().state;
+    final twoFa =
+        settingsState is SettingsLoaded ? settingsState.twoFaStatus : null;
 
-    return BlocBuilder<AccountCubit, AccountState>(
+    return BlocListener<SettingsCubit, SettingsState>(
+      listenWhen: (prev, curr) => curr is SettingsLoaded,
+      listener: (context, sState) {
+        // Reflect the backend theme preference in the app on first load.
+        if (sState is SettingsLoaded) {
+          final desired = sState.theme == AppThemePreference.dark
+              ? ThemeMode.dark
+              : ThemeMode.light;
+          if (context.read<ThemeCubit>().state != desired) {
+            context.read<ThemeCubit>().setThemeMode(desired);
+          }
+        }
+      },
+      child: BlocBuilder<AccountCubit, AccountState>(
       builder: (context, state) {
         final profileLoaded = state is AccountLoaded;
         final firstName = profileLoaded ? state.personalInfo.firstName : '';
@@ -190,9 +211,14 @@ class _SettingsViewState extends State<SettingsView> {
                   title: const KText('Dark Theme', style: KTextStyle.bodyLarge, fontWeight: FontWeight.bold),
                   subtitle: const KText('Switch app style to dark mode', style: KTextStyle.bodyMedium),
                   value: isDark,
-                  activeColor: theme.colorScheme.primary,
+                  activeThumbColor: theme.colorScheme.primary,
                   onChanged: (value) {
-                    context.read<ThemeCubit>().toggleTheme();
+                    context.read<ThemeCubit>().setThemeMode(
+                        value ? ThemeMode.dark : ThemeMode.light);
+                    // Persist the preference to the backend (POST /api/kyc/theme/set).
+                    context.read<SettingsCubit>().updateTheme(value
+                        ? AppThemePreference.dark
+                        : AppThemePreference.light);
                   },
                 ),
               ),
@@ -220,6 +246,28 @@ class _SettingsViewState extends State<SettingsView> {
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => _showChangePasswordDialog(context),
                     ),
+                    const Divider(height: 1),
+                    // Real 2FA status (GET /api/2fa/status).
+                    ListTile(
+                      leading: const Icon(Icons.shield_outlined),
+                      title: const KText('Two-Factor Authentication', style: KTextStyle.bodyLarge, fontWeight: FontWeight.bold),
+                      subtitle: KText(
+                        twoFa == null
+                            ? 'Checking status…'
+                            : (twoFa.enabled ? 'Enabled' : 'Disabled'),
+                        style: KTextStyle.bodyMedium,
+                      ),
+                      trailing: twoFa == null
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Icon(
+                              twoFa.enabled ? Icons.check_circle : Icons.cancel_outlined,
+                              color: twoFa.enabled ? Colors.green : theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                            ),
+                    ),
                   ],
                 ),
               ),
@@ -234,7 +282,7 @@ class _SettingsViewState extends State<SettingsView> {
                     SwitchListTile(
                       title: const KText('Email Alerts', style: KTextStyle.bodyLarge, fontWeight: FontWeight.bold),
                       value: _emailNotifications,
-                      activeColor: theme.colorScheme.primary,
+                      activeThumbColor: theme.colorScheme.primary,
                       onChanged: (value) {
                         setState(() {
                           _emailNotifications = value;
@@ -245,7 +293,7 @@ class _SettingsViewState extends State<SettingsView> {
                     SwitchListTile(
                       title: const KText('Push Alerts', style: KTextStyle.bodyLarge, fontWeight: FontWeight.bold),
                       value: _pushNotifications,
-                      activeColor: theme.colorScheme.primary,
+                      activeThumbColor: theme.colorScheme.primary,
                       onChanged: (value) {
                         setState(() {
                           _pushNotifications = value;
@@ -256,7 +304,7 @@ class _SettingsViewState extends State<SettingsView> {
                     SwitchListTile(
                       title: const KText('SMS / Mobile Alerts', style: KTextStyle.bodyLarge, fontWeight: FontWeight.bold),
                       value: _smsNotifications,
-                      activeColor: theme.colorScheme.primary,
+                      activeThumbColor: theme.colorScheme.primary,
                       onChanged: (value) {
                         setState(() {
                           _smsNotifications = value;
@@ -284,6 +332,7 @@ class _SettingsViewState extends State<SettingsView> {
           ),
         );
       },
+      ),
     );
   }
 }

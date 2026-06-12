@@ -1,38 +1,48 @@
 import '../../domain/repositories/portfolio_repository.dart';
 import '../models/portfolio_model.dart';
+import 'package:midchains_customer_portal/src/core/network/dio_client.dart';
+import 'package:midchains_customer_portal/src/core/storage/secure_storage_service.dart';
 
 class PortfolioRepositoryImpl implements PortfolioRepository {
+  final DioClient _client;
+  final SecureStorageService _storage;
+
+  PortfolioRepositoryImpl({
+    required DioClient client,
+    required SecureStorageService storage,
+  })  : _client = client,
+        _storage = storage;
+
   @override
-  Future<Portfolio> getPortfolio() async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 800));
-    return Portfolio(
-      totalBalance: 274382.50,
-      currency: 'AED',
-      balanceHistory: [240000.0, 248000.0, 245000.0, 255000.0, 268000.0, 272000.0, 274382.50],
-      holdings: [
-        AssetHolding(
-          assetName: 'Bitcoin',
-          assetSymbol: 'BTC',
-          amount: 1.45,
-          valueInCurrency: 187425.20,
-          change24h: 4.25,
-        ),
-        AssetHolding(
-          assetName: 'Ethereum',
-          assetSymbol: 'ETH',
-          amount: 8.20,
-          valueInCurrency: 62145.80,
-          change24h: -1.15,
-        ),
-        AssetHolding(
-          assetName: 'UAE Dirham',
-          assetSymbol: 'AED',
-          amount: 24811.50,
-          valueInCurrency: 24811.50,
-          change24h: 0.00,
-        ),
-      ],
-    );
+  Future<DashboardData> getDashboard() async {
+    try {
+      // Real first name from the aggregate profile endpoint.
+      String userName = '';
+      final profileRes = await _client.dio.get('/api/kyc/client-profiles/all');
+      final profileBody = profileRes.data as Map<String, dynamic>;
+      final data = (profileBody['data'] ?? profileBody) as Map<String, dynamic>;
+      final personal =
+          (data['personalAndResidential'] as Map?)?.cast<String, dynamic>() ?? {};
+      userName = (personal['firstname'] ?? '').toString().trim();
+      if (userName.isEmpty) {
+        userName = (await _storage.getUserName()) ?? '';
+      }
+
+      // Real wallet holdings (empty for accounts with no linked wallet).
+      final walletRes =
+          await _client.dio.get('/api/kyc/client-profiles/wallet');
+      final walletBody = walletRes.data as Map<String, dynamic>;
+      final walletData = walletBody['data'];
+      final holdings = walletData is List
+          ? walletData
+              .whereType<Map>()
+              .map((e) => WalletHolding.fromJson(e.cast<String, dynamic>()))
+              .toList()
+          : <WalletHolding>[];
+
+      return DashboardData(userName: userName, holdings: holdings);
+    } catch (e) {
+      throw Exception('Failed to load dashboard: $e');
+    }
   }
 }

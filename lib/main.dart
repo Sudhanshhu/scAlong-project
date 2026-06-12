@@ -11,6 +11,8 @@ import 'src/features/account/data/repositories/account_repository_impl.dart';
 import 'src/features/account/domain/repositories/account_repository.dart';
 import 'src/features/notifications/data/repositories/notifications_repository_impl.dart';
 import 'src/features/notifications/domain/repositories/notifications_repository.dart';
+import 'src/features/settings/data/repositories/settings_repository_impl.dart';
+import 'src/features/settings/domain/repositories/settings_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,9 +21,10 @@ void main() async {
   final dioClient = DioClient(secureStorageService: secureStorage);
   
   final authRepository = AuthRepositoryImpl(client: dioClient, storage: secureStorage);
-  final portfolioRepository = PortfolioRepositoryImpl();
-  final accountRepository = AccountRepositoryImpl(client: dioClient);
+  final portfolioRepository = PortfolioRepositoryImpl(client: dioClient, storage: secureStorage);
+  final accountRepository = AccountRepositoryImpl(client: dioClient, storage: secureStorage);
   final notificationsRepository = NotificationsRepositoryImpl();
+  final settingsRepository = SettingsRepositoryImpl(client: dioClient);
 
   runApp(
     MultiRepositoryProvider(
@@ -32,6 +35,7 @@ void main() async {
         RepositoryProvider<PortfolioRepository>.value(value: portfolioRepository),
         RepositoryProvider<AccountRepository>.value(value: accountRepository),
         RepositoryProvider<NotificationsRepository>.value(value: notificationsRepository),
+        RepositoryProvider<SettingsRepository>.value(value: settingsRepository),
       ],
       child: App(secureStorageService: secureStorage),
     ),

@@ -31,7 +31,6 @@ class KButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     final Widget content = isLoading
         ? SizedBox(
@@ -117,9 +116,9 @@ class KButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: buttonStyle.copyWith(
-          backgroundColor: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.disabled)) {
-              return theme.disabledColor.withOpacity(0.12);
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.disabled)) {
+              return theme.disabledColor.withValues(alpha: 0.12);
             }
             return AppTheme.primaryEmerald;
           }),

@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/account_cubit.dart';
 import '../bloc/account_state.dart';
 import 'package:midchains_customer_portal/src/common/widgets/k_text.dart';
-import 'package:midchains_customer_portal/src/core/theme/app_theme.dart';
 
 class AccountDetailsView extends StatefulWidget {
   const AccountDetailsView({super.key});
@@ -27,8 +26,40 @@ class _AccountDetailsViewState extends State<AccountDetailsView> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          KText(label, style: KTextStyle.bodyMedium, color: theme.colorScheme.onBackground.withOpacity(0.5)),
+          KText(label, style: KTextStyle.bodyMedium, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
           KText(value, style: KTextStyle.bodyMedium, fontWeight: FontWeight.bold),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String message,
+  }) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.15)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 56, color: theme.colorScheme.onSurface.withValues(alpha: 0.25)),
+          const SizedBox(height: 16),
+          KText(title, style: KTextStyle.titleMedium, fontWeight: FontWeight.bold),
+          const SizedBox(height: 8),
+          KText(
+            message,
+            style: KTextStyle.bodyMedium,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );
@@ -86,6 +117,7 @@ class _AccountDetailsViewState extends State<AccountDetailsView> {
           final docs = state.documents;
           final wallet = state.wallet;
           final fatca = state.fatca;
+          final bank = state.bank;
 
           return DefaultTabController(
             length: 4,
@@ -97,7 +129,7 @@ class _AccountDetailsViewState extends State<AccountDetailsView> {
                   tabAlignment: TabAlignment.start,
                   indicatorColor: theme.colorScheme.primary,
                   labelColor: theme.colorScheme.primary,
-                  unselectedLabelColor: theme.colorScheme.onBackground.withOpacity(0.5),
+                  unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   tabs: const [
                     Tab(text: 'Profile'),
                     Tab(text: 'KYC Status'),
@@ -165,7 +197,7 @@ class _AccountDetailsViewState extends State<AccountDetailsView> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                       decoration: BoxDecoration(
-                                        color: _getStatusColor(kyc.kycStatus).withOpacity(0.15),
+                                        color: _getStatusColor(kyc.kycStatus).withValues(alpha: 0.15),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: KText(
@@ -207,11 +239,11 @@ class _AccountDetailsViewState extends State<AccountDetailsView> {
                                     child: Icon(Icons.badge_outlined, color: theme.colorScheme.primary),
                                   ),
                                   title: KText(doc.docType.replaceAll('_', ' '), style: KTextStyle.titleMedium, fontWeight: FontWeight.bold),
-                                  subtitle: KText('No: ${doc.docNumber} | Exp: ${doc.expiryDate}', style: KTextStyle.bodyMedium, color: theme.colorScheme.onBackground.withOpacity(0.5)),
+                                  subtitle: KText('No: ${doc.docNumber} | Exp: ${doc.expiryDate}', style: KTextStyle.bodyMedium, color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                                   trailing: Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                     decoration: BoxDecoration(
-                                      color: _getStatusColor(doc.status).withOpacity(0.15),
+                                      color: _getStatusColor(doc.status).withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: KText(
@@ -236,111 +268,126 @@ class _AccountDetailsViewState extends State<AccountDetailsView> {
                       children: [
                         const KText('Linked Bank Account', style: KTextStyle.titleLarge, fontWeight: FontWeight.bold),
                         const SizedBox(height: 16),
-                        // Fallback mock check if bank details returns unexpected/empty
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const KText('Emirates NBD', style: KTextStyle.titleMedium, fontWeight: FontWeight.bold),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: Colors.green.withOpacity(0.15),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: const KText(
-                                        'VERIFIED',
-                                        style: KTextStyle.labelLarge,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.green,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                _buildInfoRow(context, 'Account Number', 'XXXXXX1234'),
-                                const Divider(height: 1),
-                                _buildInfoRow(context, 'Currency', 'AED'),
-                                const Divider(height: 1),
-                                _buildInfoRow(context, 'IBAN', 'AE070331234567890123456'),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        const KText('Crypto Wallet Address', style: KTextStyle.titleLarge, fontWeight: FontWeight.bold),
-                        const SizedBox(height: 16),
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    KText(wallet.network, style: KTextStyle.titleMedium, fontWeight: FontWeight.bold),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                      decoration: BoxDecoration(
-                                        color: _getStatusColor(wallet.status).withOpacity(0.15),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: KText(
-                                        wallet.status,
-                                        style: KTextStyle.labelLarge,
-                                        fontWeight: FontWeight.bold,
-                                        color: _getStatusColor(wallet.status),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                const KText('Wallet Address', style: KTextStyle.bodyMedium),
-                                const SizedBox(height: 8),
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.outline.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Row(
+                        if (bank == null)
+                          _buildEmptyState(
+                            context,
+                            icon: Icons.account_balance_outlined,
+                            title: 'No Bank Linked',
+                            message: 'You have not linked a bank account yet.',
+                          )
+                        else
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Expanded(
-                                        child: Text(
-                                          wallet.walletAddress,
-                                          style: theme.textTheme.bodyMedium?.copyWith(
-                                            fontFamily: 'monospace',
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
+                                      KText(bank.bankName, style: KTextStyle.titleMedium, fontWeight: FontWeight.bold),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: _getStatusColor(bank.status).withValues(alpha: 0.15),
+                                          borderRadius: BorderRadius.circular(20),
                                         ),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.copy_outlined, size: 20),
-                                        onPressed: () {
-                                          Clipboard.setData(ClipboardData(text: wallet.walletAddress));
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
-                                              content: Text('Wallet address copied to clipboard'),
-                                              duration: Duration(seconds: 1),
-                                            ),
-                                          );
-                                        },
+                                        child: KText(
+                                          bank.status,
+                                          style: KTextStyle.labelLarge,
+                                          fontWeight: FontWeight.bold,
+                                          color: _getStatusColor(bank.status),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 20),
+                                  _buildInfoRow(context, 'Account Number', bank.accountNumber),
+                                  const Divider(height: 1),
+                                  _buildInfoRow(context, 'Currency', bank.currency),
+                                  const Divider(height: 1),
+                                  _buildInfoRow(context, 'IBAN', bank.iban),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
+                        const SizedBox(height: 32),
+                        const KText('Crypto Wallet Address', style: KTextStyle.titleLarge, fontWeight: FontWeight.bold),
+                        const SizedBox(height: 16),
+                        if (!wallet.linked)
+                          _buildEmptyState(
+                            context,
+                            icon: Icons.account_balance_wallet_outlined,
+                            title: 'No Wallet Linked',
+                            message: 'You have not added a crypto wallet yet.',
+                          )
+                        else
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(24),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      KText(wallet.network, style: KTextStyle.titleMedium, fontWeight: FontWeight.bold),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: _getStatusColor(wallet.status).withValues(alpha: 0.15),
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: KText(
+                                          wallet.status,
+                                          style: KTextStyle.labelLarge,
+                                          fontWeight: FontWeight.bold,
+                                          color: _getStatusColor(wallet.status),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                  const KText('Wallet Address', style: KTextStyle.bodyMedium),
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.outline.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            wallet.walletAddress,
+                                            style: theme.textTheme.bodyMedium?.copyWith(
+                                              fontFamily: 'monospace',
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.copy_outlined, size: 20),
+                                          onPressed: () {
+                                            Clipboard.setData(ClipboardData(text: wallet.walletAddress));
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(
+                                                content: Text('Wallet address copied to clipboard'),
+                                                duration: Duration(seconds: 1),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -366,7 +413,7 @@ class _AccountDetailsViewState extends State<AccountDetailsView> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                       decoration: BoxDecoration(
-                                        color: _getStatusColor(fatca.fatcaStatus).withOpacity(0.15),
+                                        color: _getStatusColor(fatca.fatcaStatus).withValues(alpha: 0.15),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: KText(

@@ -1,15 +1,8 @@
 import '../../data/models/account_models.dart';
 
 abstract class AccountRepository {
-  Future<PersonalInfoResponse> getPersonalInfo();
-
-  Future<KycStatusResponse> getKycStatus();
-
-  Future<List<DocumentResponse>> getDocuments();
-
-  Future<WalletResponse> getWalletInfo();
-
-  Future<FatcaResponse> getFatcaInfo();
+  /// Loads the full account/profile in a single aggregate call.
+  Future<AccountDetails> getAccountDetails();
 
   Future<void> updateProfile({
     required String firstName,

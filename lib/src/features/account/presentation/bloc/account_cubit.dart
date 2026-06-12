@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/repositories/account_repository.dart';
-import '../../data/models/account_models.dart';
 import 'account_state.dart';
 
 class AccountCubit extends Cubit<AccountState> {
@@ -11,21 +10,15 @@ class AccountCubit extends Cubit<AccountState> {
   Future<void> loadAccountDetails() async {
     emit(AccountLoading());
     try {
-      // Fetch all details in parallel using Future.wait
-      final results = await Future.wait([
-        _repository.getPersonalInfo(),
-        _repository.getKycStatus(),
-        _repository.getDocuments(),
-        _repository.getWalletInfo(),
-        _repository.getFatcaInfo(),
-      ]);
+      final details = await _repository.getAccountDetails();
 
       emit(AccountLoaded(
-        personalInfo: results[0] as PersonalInfoResponse,
-        kycStatus: results[1] as KycStatusResponse,
-        documents: results[2] as List<DocumentResponse>,
-        wallet: results[3] as WalletResponse,
-        fatca: results[4] as FatcaResponse,
+        personalInfo: details.personalInfo,
+        kycStatus: details.kycStatus,
+        documents: details.documents,
+        wallet: details.wallet,
+        fatca: details.fatca,
+        bank: details.bank,
       ));
     } catch (e) {
       emit(AccountError(e.toString()));

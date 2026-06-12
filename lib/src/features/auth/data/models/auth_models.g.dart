@@ -20,22 +20,6 @@ Map<String, dynamic> _$SessionResponseToJson(SessionResponse instance) =>
       'sessionId': instance.sessionId,
     };
 
-CaptchaRequestResponse _$CaptchaRequestResponseFromJson(
-  Map<String, dynamic> json,
-) => CaptchaRequestResponse(
-  captchaImage: json['captchaImage'] as String,
-  message: json['message'] as String,
-  captchaId: json['captchaId'] as String,
-);
-
-Map<String, dynamic> _$CaptchaRequestResponseToJson(
-  CaptchaRequestResponse instance,
-) => <String, dynamic>{
-  'captchaImage': instance.captchaImage,
-  'message': instance.message,
-  'captchaId': instance.captchaId,
-};
-
 CaptchaValidateResponse _$CaptchaValidateResponseFromJson(
   Map<String, dynamic> json,
 ) => CaptchaValidateResponse(

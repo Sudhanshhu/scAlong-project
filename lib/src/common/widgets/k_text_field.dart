@@ -43,25 +43,25 @@ class _KTextFieldState extends State<KTextField> {
       onChanged: widget.onChanged,
       enabled: widget.enabled,
       style: theme.textTheme.bodyMedium?.copyWith(
-        color: widget.enabled ? theme.colorScheme.onBackground : theme.disabledColor,
+        color: widget.enabled ? theme.colorScheme.onSurface : theme.disabledColor,
       ),
       decoration: InputDecoration(
         labelText: widget.labelText,
         hintText: widget.hintText,
         labelStyle: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onBackground.withOpacity(0.6),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         hintStyle: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onBackground.withOpacity(0.4),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
         ),
         prefixIcon: widget.prefixIcon != null
-            ? Icon(widget.prefixIcon, color: theme.colorScheme.primary.withOpacity(0.7))
+            ? Icon(widget.prefixIcon, color: theme.colorScheme.primary.withValues(alpha: 0.7))
             : null,
         suffixIcon: widget.isPassword
             ? IconButton(
                 icon: Icon(
                   _obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                  color: theme.colorScheme.onBackground.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 onPressed: () {
                   setState(() {
@@ -74,14 +74,14 @@ class _KTextFieldState extends State<KTextField> {
         filled: true,
         fillColor: widget.enabled
             ? theme.colorScheme.surface
-            : theme.disabledColor.withOpacity(0.04),
+            : theme.disabledColor.withValues(alpha: 0.04),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.colorScheme.outline.withOpacity(0.5)),
+          borderSide: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.colorScheme.outline.withOpacity(0.5)),
+          borderSide: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

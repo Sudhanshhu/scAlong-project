@@ -18,6 +18,7 @@ class AccountLoaded extends AccountState {
   final List<DocumentResponse> documents;
   final WalletResponse wallet;
   final FatcaResponse fatca;
+  final BankResponse? bank;
 
   const AccountLoaded({
     required this.personalInfo,
@@ -25,10 +26,12 @@ class AccountLoaded extends AccountState {
     required this.documents,
     required this.wallet,
     required this.fatca,
+    this.bank,
   });
 
   @override
-  List<Object?> get props => [personalInfo, kycStatus, documents, wallet, fatca];
+  List<Object?> get props =>
+      [personalInfo, kycStatus, documents, wallet, fatca, bank];
 }
 
 class AccountError extends AccountState {

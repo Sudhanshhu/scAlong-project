@@ -87,7 +87,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                           Icon(
                             Icons.notifications_off_outlined,
                             size: 72,
-                            color: theme.colorScheme.onBackground.withOpacity(0.3),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                           ),
                           const SizedBox(height: 16),
                           const KText(
@@ -99,7 +99,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                           KText(
                             'You do not have any new notifications.',
                             style: KTextStyle.bodyMedium,
-                            color: theme.colorScheme.onBackground.withOpacity(0.5),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                           ),
                         ],
                       ),
@@ -114,7 +114,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                         return Card(
                           color: notification.isRead 
                               ? theme.cardTheme.color 
-                              : theme.colorScheme.primary.withOpacity(0.04),
+                              : theme.colorScheme.primary.withValues(alpha: 0.04),
                           child: InkWell(
                             borderRadius: BorderRadius.circular(16),
                             onTap: () {
@@ -168,7 +168,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                                             KText(
                                               _formatTimestamp(notification.timestamp),
                                               style: KTextStyle.bodyMedium,
-                                              color: theme.colorScheme.onBackground.withOpacity(0.4),
+                                              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                                             ),
                                           ],
                                         ),
@@ -176,7 +176,7 @@ class _NotificationsViewState extends State<NotificationsView> {
                                         KText(
                                           notification.message,
                                           style: KTextStyle.bodyMedium,
-                                          color: theme.colorScheme.onBackground.withOpacity(0.6),
+                                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                                         ),
                                       ],
                                     ),

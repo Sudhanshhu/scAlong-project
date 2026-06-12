@@ -61,7 +61,7 @@ class KText extends StatelessWidget {
 
     if (textStyle != null) {
       textStyle = textStyle.copyWith(
-        color: color ?? theme.colorScheme.onBackground,
+        color: color ?? theme.colorScheme.onSurface,
         fontWeight: fontWeight ?? textStyle.fontWeight,
       );
     }

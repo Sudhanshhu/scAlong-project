@@ -6,48 +6,44 @@ class AppTheme {
 
   // Color Constants
   static const Color primaryEmerald = Color(0xFF0D9F67); // Emerald Green
-  static const Color accentGold = Color(0xFFF59E0B);    // Gold/Amber
-  static const Color darkBg = Color(0xFF0B0F19);        // Deep Slate Dark
-  static const Color darkSurface = Color(0xFF131C2E);   // Glass/Card Dark
-  static const Color lightBg = Color(0xFFF8FAFC);       // Soft Ice White
-  static const Color lightSurface = Color(0xFFFFFFFF);  // Pure White
+  static const Color accentGold = Color(0xFFF59E0B); // Gold/Amber
+  static const Color darkBg = Color(0xFF0B0F19); // Deep Slate Dark
+  static const Color darkSurface = Color(0xFF131C2E); // Glass/Card Dark
+  static const Color lightBg = Color(0xFFF8FAFC); // Soft Ice White
+  static const Color lightSurface = Color(0xFFFFFFFF); // Pure White
 
   // Light Theme Color Scheme
-  static final ColorScheme _lightColorScheme = ColorScheme.light(
+  static const ColorScheme _lightColorScheme = ColorScheme.light(
     primary: primaryEmerald,
     onPrimary: Colors.white,
-    primaryContainer: const Color(0xFFD1FAE5),
-    onPrimaryContainer: const Color(0xFF065F46),
+    primaryContainer: Color(0xFFD1FAE5),
+    onPrimaryContainer: Color(0xFF065F46),
     secondary: accentGold,
     onSecondary: Colors.white,
-    secondaryContainer: const Color(0xFFFEF3C7),
-    onSecondaryContainer: const Color(0xFF92400E),
+    secondaryContainer: Color(0xFFFEF3C7),
+    onSecondaryContainer: Color(0xFF92400E),
     surface: lightSurface,
-    onSurface: const Color(0xFF0F172A),
-    background: lightBg,
-    onBackground: const Color(0xFF0F172A),
-    error: const Color(0xFFEF4444),
+    onSurface: Color(0xFF0F172A),
+    error: Color(0xFFEF4444),
     onError: Colors.white,
-    outline: const Color(0xFFCBD5E1),
+    outline: Color(0xFFCBD5E1),
   );
 
   // Dark Theme Color Scheme
-  static final ColorScheme _darkColorScheme = ColorScheme.dark(
+  static const ColorScheme _darkColorScheme = ColorScheme.dark(
     primary: primaryEmerald,
     onPrimary: Colors.white,
-    primaryContainer: const Color(0xFF065F46),
-    onPrimaryContainer: const Color(0xFFD1FAE5),
+    primaryContainer: Color(0xFF065F46),
+    onPrimaryContainer: Color(0xFFD1FAE5),
     secondary: accentGold,
     onSecondary: Colors.black,
-    secondaryContainer: const Color(0xFF78350F),
-    onSecondaryContainer: const Color(0xFFFEF3C7),
+    secondaryContainer: Color(0xFF78350F),
+    onSecondaryContainer: Color(0xFFFEF3C7),
     surface: darkSurface,
-    onSurface: const Color(0xFFF1F5F9),
-    background: darkBg,
-    onBackground: const Color(0xFFF1F5F9),
-    error: const Color(0xFFF87171),
+    onSurface: Color(0xFFF1F5F9),
+    error: Color(0xFFF87171),
     onError: Colors.black,
-    outline: const Color(0xFF334155),
+    outline: Color(0xFF334155),
   );
 
   // Text Theme Configuration using Google Fonts
@@ -56,37 +52,37 @@ class AppTheme {
       displayLarge: GoogleFonts.outfit(
         fontSize: 32,
         fontWeight: FontWeight.bold,
-        color: colorScheme.onBackground,
+        color: colorScheme.onSurface,
       ),
       displayMedium: GoogleFonts.outfit(
         fontSize: 28,
         fontWeight: FontWeight.bold,
-        color: colorScheme.onBackground,
+        color: colorScheme.onSurface,
       ),
       titleLarge: GoogleFonts.outfit(
         fontSize: 20,
         fontWeight: FontWeight.w600,
-        color: colorScheme.onBackground,
+        color: colorScheme.onSurface,
       ),
       titleMedium: GoogleFonts.outfit(
         fontSize: 16,
         fontWeight: FontWeight.w600,
-        color: colorScheme.onBackground,
+        color: colorScheme.onSurface,
       ),
       bodyLarge: GoogleFonts.outfit(
         fontSize: 16,
         fontWeight: FontWeight.normal,
-        color: colorScheme.onBackground,
+        color: colorScheme.onSurface,
       ),
       bodyMedium: GoogleFonts.outfit(
         fontSize: 14,
         fontWeight: FontWeight.normal,
-        color: colorScheme.onBackground,
+        color: colorScheme.onSurface,
       ),
       labelLarge: GoogleFonts.outfit(
         fontSize: 14,
         fontWeight: FontWeight.w500,
-        color: colorScheme.onBackground,
+        color: colorScheme.onSurface,
       ),
     );
   }
@@ -103,15 +99,17 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: _lightColorScheme.outline.withOpacity(0.2)),
+          side: BorderSide(
+            color: _lightColorScheme.outline.withValues(alpha: 0.2),
+          ),
         ),
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: lightBg,
         elevation: 0,
-        iconTheme: IconThemeData(color: _lightColorScheme.onBackground),
+        iconTheme: IconThemeData(color: _lightColorScheme.onSurface),
         titleTextStyle: GoogleFonts.outfit(
-          color: _lightColorScheme.onBackground,
+          color: _lightColorScheme.onSurface,
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
@@ -146,15 +144,17 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: _darkColorScheme.outline.withOpacity(0.3)),
+          side: BorderSide(
+            color: _darkColorScheme.outline.withValues(alpha: 0.3),
+          ),
         ),
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: darkBg,
         elevation: 0,
-        iconTheme: IconThemeData(color: _darkColorScheme.onBackground),
+        iconTheme: IconThemeData(color: _darkColorScheme.onSurface),
         titleTextStyle: GoogleFonts.outfit(
-          color: _darkColorScheme.onBackground,
+          color: _darkColorScheme.onSurface,
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),

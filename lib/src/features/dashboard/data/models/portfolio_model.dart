@@ -1,29 +1,39 @@
-class AssetHolding {
-  final String assetName;
-  final String assetSymbol;
-  final double amount;
-  final double valueInCurrency;
-  final double change24h;
+/// A real wallet entry returned by `/api/kyc/client-profiles/wallet`.
+/// The dev account has no linked wallet, so the list comes back empty.
+class WalletHolding {
+  final String network;
+  final String address;
+  final String status;
 
-  AssetHolding({
-    required this.assetName,
-    required this.assetSymbol,
-    required this.amount,
-    required this.valueInCurrency,
-    required this.change24h,
+  WalletHolding({
+    required this.network,
+    required this.address,
+    required this.status,
   });
+
+  factory WalletHolding.fromJson(Map<String, dynamic> json) {
+    String s(dynamic v, [String fb = 'N/A']) {
+      if (v == null) return fb;
+      final t = v.toString().trim();
+      return t.isEmpty ? fb : t;
+    }
+
+    return WalletHolding(
+      network: s(json['network'] ?? json['chain']),
+      address: s(json['walletAddress'] ?? json['address']),
+      status: s(json['status'], 'ACTIVE'),
+    );
+  }
 }
 
-class Portfolio {
-  final double totalBalance;
-  final String currency;
-  final List<AssetHolding> holdings;
-  final List<double> balanceHistory; // For chart plotting
+/// Aggregate data for the dashboard home tab. Only contains values that come
+/// from real endpoints: the user's first name and any linked wallets.
+class DashboardData {
+  final String userName;
+  final List<WalletHolding> holdings;
 
-  Portfolio({
-    required this.totalBalance,
-    required this.currency,
+  DashboardData({
+    required this.userName,
     required this.holdings,
-    required this.balanceHistory,
   });
 }

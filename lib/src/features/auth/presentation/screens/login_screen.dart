@@ -64,6 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   'captchaImage': state.captchaImage,
                 },
               ).then((result) {
+                if (!context.mounted) return;
                 // If captcha validate was successful, it auto-advances to OTP
                 if (result == true) {
                   context.push('/otp', extra: {
@@ -74,16 +75,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 }
               });
             } else if (state is AuthFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: KText(
-                    state.message.replaceAll('Exception:', '').trim(),
-                    color: Colors.white,
+              // The captcha/OTP screens own their own error toasts while they
+              // are on top; only show here when login is the active route.
+              final isLoginOnTop = ModalRoute.of(context)?.isCurrent ?? true;
+              if (isLoginOnTop) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: KText(
+                      state.message.replaceAll('Exception:', '').trim(),
+                      color: Colors.white,
+                    ),
+                    backgroundColor: theme.colorScheme.error,
+                    behavior: SnackBarBehavior.floating,
                   ),
-                  backgroundColor: theme.colorScheme.error,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+                );
+              }
             }
           },
           builder: (context, state) {
@@ -125,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             KText(
                               'Securely trade and manage your assets',
                               style: KTextStyle.bodyMedium,
-                              color: theme.colorScheme.onBackground.withOpacity(0.5),
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                             ),
                           ],
                         ),
@@ -140,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       KText(
                         'Enter your credentials to login to your dashboard',
                         style: KTextStyle.bodyMedium,
-                        color: theme.colorScheme.onBackground.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                       const SizedBox(height: 32),
                       

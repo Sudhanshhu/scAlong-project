@@ -30,12 +30,12 @@ String getArgon2Hash(String password, String saltStr) {
 
 void main() {
   test('Argon2i client hashing matches expected server value', () {
-    final password = 'Test@123';
-    final salt = '94fbe771-7846-437a-8691-e4c7dc5261fe';
-    
+    const password = 'Test@123';
+    const salt = '94fbe771-7846-437a-8691-e4c7dc5261fe';
+
     final hash = getArgon2Hash(password, salt);
-    
-    final expected = '\$argon2i\$v=19\$m=19456,t=1,p=1\$OTRmYmU3NzEtNzg0Ni00MzdhLTg2OTEtZTRjN2RjNTI2MWZl\$Rb71FC33w34I1NEwI5GNcGTKuGV9ELcRzR4lYytXES8';
+
+    const expected = '\$argon2i\$v=19\$m=19456,t=1,p=1\$OTRmYmU3NzEtNzg0Ni00MzdhLTg2OTEtZTRjN2RjNTI2MWZl\$Rb71FC33w34I1NEwI5GNcGTKuGV9ELcRzR4lYytXES8';
     
     expect(hash, expected);
   });

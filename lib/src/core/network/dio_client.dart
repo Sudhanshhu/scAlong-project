@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'dart:io';
 import '../storage/secure_storage_service.dart';
 
 class DioClient {

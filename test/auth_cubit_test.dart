@@ -21,9 +21,12 @@ class FakeAuthRepository implements AuthRepository {
     required String password,
   }) async {
     return CaptchaRequestResponse(
-      captchaImage: 'base64_image_data',
-      message: 'Success',
-      captchaId: 'captcha_uuid_123',
+      success: true,
+      data: CaptchaData(
+        captchaId: 'captcha_uuid_123',
+        imageUrl: 'base64_image_data',
+        type: 'SLIDER',
+      ),
     );
   }
 

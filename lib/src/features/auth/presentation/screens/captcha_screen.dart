@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../bloc/auth_cubit.dart';
 import '../bloc/auth_state.dart';
 import 'package:midchains_customer_portal/src/common/widgets/k_text.dart';
-import 'package:midchains_customer_portal/src/common/widgets/k_button.dart';
 
 class CaptchaScreen extends StatefulWidget {
   final String captchaId;
@@ -85,15 +84,18 @@ class _CaptchaScreenState extends State<CaptchaScreen> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state is AuthCaptchaValidated) {
+            // Captcha passed — show the green "Verified!" state, but do NOT
+            // advance yet. We only move on once the post-captcha checks
+            // (2FA / OTP options) confirm the account is valid.
             setState(() {
               _isSuccess = true;
             });
-            // Return true to the caller to signal successful CAPTCHA validation
-            Future.delayed(const Duration(milliseconds: 600), () {
-              if (mounted) {
-                context.pop(true);
-              }
-            });
+          } else if (state is AuthOtpOptionsReceived) {
+            // The account is valid and the OTP flow is ready. Now it's safe
+            // to return to the login screen so it can route to the OTP page.
+            if (mounted) {
+              context.pop(true);
+            }
           } else if (state is AuthFailure) {
             // Reset slider on failure
             setState(() {
@@ -129,7 +131,7 @@ class _CaptchaScreenState extends State<CaptchaScreen> {
                 KText(
                   'Drag the slider to verify you are a human.',
                   style: KTextStyle.bodyMedium,
-                  color: theme.colorScheme.onBackground.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
@@ -143,7 +145,7 @@ class _CaptchaScreenState extends State<CaptchaScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 16,
                         spreadRadius: 2,
                       ),
@@ -196,7 +198,7 @@ class _CaptchaScreenState extends State<CaptchaScreen> {
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final trackWidth = constraints.maxWidth;
-                      final handleSize = 48.0;
+                      const handleSize = 48.0;
                       final maxDragWidth = trackWidth - handleSize;
                       final currentOffset = _sliderValue * maxDragWidth;
 
@@ -214,10 +216,10 @@ class _CaptchaScreenState extends State<CaptchaScreen> {
                               child: CustomPaint(
                                 painter: _KSliderTrackPainter(
                                   progress: _sliderValue,
-                                  trackColor: theme.colorScheme.outline.withOpacity(0.15),
+                                  trackColor: theme.colorScheme.outline.withValues(alpha: 0.15),
                                   activeColor: _isSuccess 
                                       ? Colors.green.shade400 
-                                      : theme.colorScheme.primary.withOpacity(0.4),
+                                      : theme.colorScheme.primary.withValues(alpha: 0.4),
                                 ),
                               ),
                             ),
@@ -229,7 +231,7 @@ class _CaptchaScreenState extends State<CaptchaScreen> {
                                     ? 'Verified!'
                                     : (isValidating ? 'Validating...' : 'Slide to the right >>'),
                                 style: KTextStyle.bodyMedium,
-                                color: theme.colorScheme.onBackground.withOpacity(0.4),
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -247,7 +249,7 @@ class _CaptchaScreenState extends State<CaptchaScreen> {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
+                                      color: Colors.black.withValues(alpha: 0.2),
                                       blurRadius: 4,
                                       offset: const Offset(0, 2),
                                     ),
