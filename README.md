@@ -59,6 +59,7 @@ lib/
 ├── src/
 │   ├── app.dart                   # Root MaterialApp config
 │   ├── core/                      # Core configurations
+│   │   ├── di/                    # get_it service locator (setupServiceLocator)
 │   │   ├── theme/                 # Light/Dark Material 3 App themes
 │   │   ├── network/               # Dio client & interceptor injects
 │   │   ├── storage/               # flutter_secure_storage wrapper
@@ -100,11 +101,12 @@ Each feature folder is strictly structured into three layers to isolate dependen
      - **Data Models**: JSON-serializable DTOs (Data Transfer Objects) derived from raw payloads using automated code generators (`json_serializable`).
 
 ### Key Framework & Technology Choices
-1. **State Management**: **BLoC / Cubit** (`flutter_bloc`). Used to drive reactive states per screen (e.g., `AuthCubit` driving login checkpoints, `ThemeCubit` driving dark mode toggles).
-2. **Networking**: **Dio** (`dio`). Integrated with global interceptors that automatically inject `sessionId`, `x-user-name`, and `Authorization: Bearer <token>` headers as required by the Midchains gateway.
-3. **Password Hashing**: **Argon2i** (`argon2`). Implemented purely in Dart to hash passwords on-device using the `security` UUID salt returned during session init before sending payloads to `/login/v2`.
-4. **Token Persistence**: **Flutter Secure Storage** (`flutter_secure_storage`). Encrypts and persists tokens in Keychain (iOS) and KeyStore (Android) securely.
-5. **Design System**: **Material 3**. Styled using Outfit fonts, custom Card shapes, and dynamic light/dark theme switching synced to the backend theme preference.
+1. **Dependency Injection**: **get_it** (`get_it`) service locator. All dependencies are registered once in [`core/di/service_locator.dart`](lib/src/core/di/service_locator.dart) via `setupServiceLocator()` (called from `main()`): core services (`SecureStorageService`, `DioClient`) and repositories as lazy singletons, cubits as factories (fresh per screen), and `ThemeCubit` as an app-wide singleton. Screens resolve their cubit with `getIt<XCubit>()` inside a `BlocProvider`, so the widget tree owns lifecycle while the object graph stays centralised and testable.
+2. **State Management**: **BLoC / Cubit** (`flutter_bloc`). Used to drive reactive states per screen (e.g., `AuthCubit` driving login checkpoints, `ThemeCubit` driving dark mode toggles).
+3. **Networking**: **Dio** (`dio`). Integrated with global interceptors that automatically inject `sessionId`, `x-user-name`, and `Authorization: Bearer <token>` headers as required by the Midchains gateway.
+4. **Password Hashing**: **Argon2i** (`argon2`). Implemented purely in Dart to hash passwords on-device using the `security` UUID salt returned during session init before sending payloads to `/login/v2`.
+5. **Token Persistence**: **Flutter Secure Storage** (`flutter_secure_storage`). Encrypts and persists tokens in Keychain (iOS) and KeyStore (Android) securely.
+6. **Design System**: **Material 3**. Styled using Outfit fonts, custom Card shapes, and dynamic light/dark theme switching synced to the backend theme preference.
 
 ---
 

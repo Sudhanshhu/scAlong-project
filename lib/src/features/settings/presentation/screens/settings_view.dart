@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:midchains_customer_portal/src/core/di/service_locator.dart';
 import 'package:midchains_customer_portal/src/core/theme/theme_cubit.dart';
 import 'package:midchains_customer_portal/src/features/auth/domain/repositories/auth_repository.dart';
 import 'package:midchains_customer_portal/src/features/account/presentation/bloc/account_cubit.dart';
@@ -321,7 +322,7 @@ class _SettingsViewState extends State<SettingsView> {
                 text: 'Log Out',
                 type: KButtonType.secondary,
                 onPressed: () async {
-                  await context.read<AuthRepository>().logout();
+                  await getIt<AuthRepository>().logout();
                   if (context.mounted) {
                     context.go('/login');
                   }

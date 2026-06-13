@@ -32,7 +32,7 @@ class KDropdown<T> extends StatelessWidget {
     final theme = Theme.of(context);
 
     return DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       items: items.map((item) {
         return DropdownMenuItem<T>(
           value: item.value,
@@ -49,23 +49,23 @@ class KDropdown<T> extends StatelessWidget {
         labelText: labelText,
         hintText: hintText,
         labelStyle: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onBackground.withOpacity(0.6),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
         ),
         hintStyle: theme.textTheme.bodyMedium?.copyWith(
-          color: theme.colorScheme.onBackground.withOpacity(0.4),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         filled: true,
         fillColor: enabled
             ? theme.colorScheme.surface
-            : theme.disabledColor.withOpacity(0.04),
+            : theme.disabledColor.withValues(alpha: 0.04),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.colorScheme.outline.withOpacity(0.5)),
+          borderSide: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: theme.colorScheme.outline.withOpacity(0.5)),
+          borderSide: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

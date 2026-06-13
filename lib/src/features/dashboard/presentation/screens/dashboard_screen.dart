@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:midchains_customer_portal/src/core/di/service_locator.dart';
 import 'package:midchains_customer_portal/src/features/dashboard/presentation/bloc/dashboard_cubit.dart';
-import 'package:midchains_customer_portal/src/features/dashboard/domain/repositories/portfolio_repository.dart';
 import 'dashboard_home_view.dart';
-import '../../../account/domain/repositories/account_repository.dart';
 import '../../../account/presentation/bloc/account_cubit.dart';
 import '../../../account/presentation/screens/account_details_view.dart';
-import '../../../notifications/domain/repositories/notifications_repository.dart';
 import '../../../notifications/presentation/bloc/notifications_cubit.dart';
 import '../../../notifications/presentation/screens/notifications_view.dart';
-import '../../../settings/domain/repositories/settings_repository.dart';
 import '../../../settings/presentation/bloc/settings_cubit.dart';
 import '../../../settings/presentation/screens/settings_view.dart';
 
@@ -20,17 +17,13 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<DashboardCubit>(
-          create: (context) => DashboardCubit(context.read<PortfolioRepository>()),
-        ),
-        BlocProvider<AccountCubit>(
-          create: (context) => AccountCubit(context.read<AccountRepository>()),
-        ),
+        BlocProvider<DashboardCubit>(create: (_) => getIt<DashboardCubit>()),
+        BlocProvider<AccountCubit>(create: (_) => getIt<AccountCubit>()),
         BlocProvider<NotificationsCubit>(
-          create: (context) => NotificationsCubit(context.read<NotificationsRepository>()),
+          create: (_) => getIt<NotificationsCubit>(),
         ),
         BlocProvider<SettingsCubit>(
-          create: (context) => SettingsCubit(context.read<SettingsRepository>())..load(),
+          create: (_) => getIt<SettingsCubit>()..load(),
         ),
       ],
       child: const DashboardScreenContent(),

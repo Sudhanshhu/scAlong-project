@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:midchains_customer_portal/src/core/di/service_locator.dart';
 import 'package:midchains_customer_portal/src/core/storage/secure_storage_service.dart';
 import 'package:midchains_customer_portal/src/common/widgets/k_text.dart';
 import 'package:midchains_customer_portal/src/core/theme/app_theme.dart';
@@ -36,7 +36,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    final storage = context.read<SecureStorageService>();
+    final storage = getIt<SecureStorageService>();
     final hasSession = await storage.hasValidSession();
     if (!mounted) return;
 

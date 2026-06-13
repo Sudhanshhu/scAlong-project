@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../domain/repositories/auth_repository.dart';
+import 'package:midchains_customer_portal/src/core/di/service_locator.dart';
 import '../bloc/auth_cubit.dart';
 import '../bloc/auth_state.dart';
 import 'package:midchains_customer_portal/src/common/widgets/k_text.dart';
@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final theme = Theme.of(context);
 
     return BlocProvider(
-      create: (context) => AuthCubit(context.read<AuthRepository>()),
+      create: (_) => getIt<AuthCubit>(),
       child: Scaffold(
         body: BlocConsumer<AuthCubit, AuthState>(
           listener: (context, state) {
